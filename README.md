@@ -1,5 +1,5 @@
 # IndecisiveBear | Untitled Game
-Repo for Untitled Game for IndecisiveBear Studios.
+Repo for Untitled Game by IndecisiveBear Studios.
 
 ## Setup:
 Prerequisites:
