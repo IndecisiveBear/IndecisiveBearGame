@@ -5,7 +5,7 @@ Repo for Untitled Game by IndecisiveBear Studios.
 ### Prerequisites:
 
 #### Windows:
-* [Unity Engine](https://unity.com/download)
+* [Unity Engine 2022.2.1](https://unity.com/releases/editor/whats-new/2022.2.1#release-notes)
 * One fo the following implementations of C#:
   * [Visual Studio](https://visualstudio.microsoft.com/downloads/)
   * [Dotnet](https://www.microsoft.com/en-us/download/details.aspx?id=7029)
@@ -13,7 +13,7 @@ Repo for Untitled Game by IndecisiveBear Studios.
 
 #### Linux (Fedora):
 
-* Unity Engine:
+* Unity Engine 2022.2.1:
 
 Follow the Red Hat Enterprise Linux (RHEL) or CentOS directions [here](https://docs.unity3d.com/hub/manual/InstallHub.html#install-hub-linux).
 
@@ -24,7 +24,7 @@ sudo dnf makecache
 ```bash
 sudo dnf install openssl1.1.x86_64
 ```
-Unity should now open without issue.
+Next, download the [correct Unity Editor](https://unity.com/releases/editor/whats-new/2022.2.1#release-notes) and install it at `~/Unity/Hub/Editor/`. Unity should nto work properly.
 
 * Dotnet
 
