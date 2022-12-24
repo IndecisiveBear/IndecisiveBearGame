@@ -2,7 +2,8 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    float speed = 0.01f;
+    const float SPEED = 0.02f;
+    float speed = SPEED;
     Vector2 position;
     GameObject[] walls;
 
@@ -15,32 +16,36 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        MovementHandler();
+        position = transform.position;
+        Move();
         transform.position = position;
     }
 
-    public void MovementHandler()
+    public void Move()
     {
         int upMoveCount = 0;
         int rightMoveCount = 0;
 
-        if (Input.GetKey("w"))
+        if (Input.GetKeyDown(KeyCode.LeftShift))
+        {
+            speed = (speed == SPEED) ? 2 * SPEED : SPEED;
+        }
+        if (Input.GetKey(KeyCode.W))
         {
             upMoveCount += 1;
         }
-        if (Input.GetKey("s"))
+        if (Input.GetKey(KeyCode.S))
         {
             upMoveCount -= 1;
         }
-        if (Input.GetKey("a"))
+        if (Input.GetKey(KeyCode.A))
         {
             rightMoveCount -= 1;
         }
-        if (Input.GetKey("d"))
+        if (Input.GetKey(KeyCode.D))
         {
             rightMoveCount += 1;
         }
-
         if (upMoveCount != 0 || rightMoveCount != 0)
         {
             var magnitude =
