@@ -1,12 +1,13 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    // Start is called before the first frame update
-    float speed = 0.01f;
+    const float SPEED = 0.02f;
+    float speed = SPEED;
+    Vector2 position;
     GameObject[] walls;
+
+    // Start is called before the first frame update
     void Start()
     {
         walls = GameObject.FindGameObjectsWithTag("Wall");
@@ -15,21 +16,43 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKey("w"))
+        position = transform.position;
+        Move();
+        transform.position = position;
+    }
+
+    public void Move()
+    {
+        int upMoveCount = 0;
+        int rightMoveCount = 0;
+
+        if (Input.GetKeyDown(KeyCode.LeftShift))
         {
-            transform.position += transform.up * speed;
+            speed = (speed == SPEED) ? 2 * SPEED : SPEED;
         }
-        if (Input.GetKey("s"))
+        if (Input.GetKey(KeyCode.W))
         {
-            transform.position -= transform.up * speed;
+            upMoveCount += 1;
         }
-        if (Input.GetKey("a"))
+        if (Input.GetKey(KeyCode.S))
         {
-            transform.position -= transform.right * speed;
+            upMoveCount -= 1;
         }
-        if (Input.GetKey("d"))
+        if (Input.GetKey(KeyCode.A))
         {
-            transform.position += transform.right * speed;
+            rightMoveCount -= 1;
+        }
+        if (Input.GetKey(KeyCode.D))
+        {
+            rightMoveCount += 1;
+        }
+        if (upMoveCount != 0 || rightMoveCount != 0)
+        {
+            var magnitude =
+                Mathf.Sqrt(rightMoveCount * rightMoveCount + upMoveCount * upMoveCount);
+            var resultant =
+                rightMoveCount * Vector2.right + upMoveCount * Vector2.up;
+            position += (resultant / magnitude) * speed;
         }
     }
 }
