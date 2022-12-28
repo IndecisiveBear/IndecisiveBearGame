@@ -24,7 +24,9 @@ sudo dnf makecache
 ```bash
 sudo dnf install openssl1.1.x86_64
 ```
-Next, download the [correct Unity Editor](https://unity.com/releases/editor/whats-new/2022.2.1#release-notes) and install it at `~/Unity/Hub/Editor/`. Unity should now work properly.
+Once complete, search for UnityHub on your machine and open it. It will guide you through the install process and license activation.
+
+The version of the Unity Editor that UnityHub downloads is not consistent with the editor we want for the project. Download the [correct Unity Editor](https://unity.com/releases/editor/whats-new/2022.2.1#release-notes) and install it at `~/Unity/Hub/Editor/` (or just download it straight from the UnityHub GUI). Unity should now work properly.
 
 * Dotnet
 
