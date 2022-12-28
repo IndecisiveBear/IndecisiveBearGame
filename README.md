@@ -17,7 +17,7 @@ Repo for Untitled Game by IndecisiveBear Studios.
 
 Follow the Red Hat Enterprise Linux (RHEL) or CentOS directions [here](https://docs.unity3d.com/hub/manual/InstallHub.html#install-hub-linux).
 
-Once the install is complete, you will not be able to activate your free license or run any projects. The reason for this is that Unity requires either openssl version 1.0 or version 1.1 to run, while Fedora comes with a more recent version. To install the necessary version, use the following:
+You will not yet be able to activate your free license or run any projects. The reason for this is that Unity requires either openssl version 1.0 or version 1.1 to run, while Fedora comes with a more recent version. To install the necessary version, use the following:
 ```bash
 sudo dnf makecache
 ```
@@ -46,6 +46,19 @@ export PATH=$PATH:$HOME/.dotnet
 export PATH=$PATH:$HOME/.dotnet/tools
 ```
 Your IDE or code editor should now recognize C#.
+
+To get IntelliSense working for Unity packages in VS Code, install the C# v1.25.0 extension and add the following to your `settings.json` file:
+```json
+"omnisharp.useModernNet": false
+```
+You will need to install a complete version of mono to proceed. To do so, follow the instructions from the [mono website](https://www.mono-project.com/download/stable/#download-lin-fedora):
+```bash
+sudo rpm --import "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF"
+sudo su -c 'curl https://download.mono-project.com/repo/centos8-stable.repo | tee /etc/yum.repos.d/mono-centos8-stable.repo'
+sudo dnf update
+sudo dnf install mono-devel
+```
+IntelliSense should now work in VS Code.
 
 ## Notes:
 This repo is in active development. The game is not yet at a working state.
