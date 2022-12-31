@@ -2,8 +2,8 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    const float SPEED = 0.02f;
-    float speed = SPEED;
+    const float PlayerSpeed = 0.01f;
+    float speed = PlayerSpeed;
     Vector2 position;
     GameObject[] walls;
 
@@ -28,7 +28,7 @@ public class Player : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.LeftShift))
         {
-            speed = (speed == SPEED) ? 2 * SPEED : SPEED;
+            speed = (speed == PlayerSpeed) ? 2 * PlayerSpeed : PlayerSpeed;
         }
         if (Input.GetKey(KeyCode.W))
         {
