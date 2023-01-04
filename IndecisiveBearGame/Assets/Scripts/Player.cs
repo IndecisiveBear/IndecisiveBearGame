@@ -20,6 +20,12 @@ public class Player : MonoBehaviour
         position = transform.position;
         Move();
         transform.position = position;
+
+        if (Input.GetKey(KeyCode.Q)) // Warp to origin, for debugging 
+        {
+            position = Vector2.zero;
+            transform.position = position;
+        }
     }
 
     /// <summary>
