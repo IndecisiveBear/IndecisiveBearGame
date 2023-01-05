@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq; // for List<int>.Max()
 using UnityEngine;
 
 public class GridGenerator : MonoBehaviour
@@ -19,13 +21,23 @@ public class GridGenerator : MonoBehaviour
 
     void Main()
     {
-        // Fix this MaxObjectCount in Grid.Item3. 
-        // I could loop over all ParseGridString(gridString[i, j])
-        // and set MaxObjectCount = max{ParseGridString(gridString[i, j])} and
-        // Grid = new GameObject[GridString.GetLength(0), GridString.GetLength(1), MaxObjectCount];
+        SetMaxObjectCount(GridString);
         Grid = new GameObject[GridString.GetLength(0), GridString.GetLength(1), MaxObjectCount];
         SetGrid(Grid, GridString);
         InstantiateGrid(Grid);
+    }
+
+    void SetMaxObjectCount(string[,] gridString)
+    {
+        List<int> objectLengths = new List<int>();
+        for(int i = 0; i < gridString.GetLength(0); i++)
+        {
+            for(int j = 0; j < gridString.GetLength(1); j++)
+            {
+                objectLengths.Add(ParseGridString(gridString[i, j]).Length);
+            }
+        }
+        MaxObjectCount = objectLengths.Max();
     }
 
     void SetGrid(GameObject[,,] grid, string[,] gridString)
