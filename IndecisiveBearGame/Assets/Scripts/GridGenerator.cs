@@ -34,7 +34,11 @@ public class GridGenerator : MonoBehaviour
     /// <c>SetPrefabs</c> acts as a constructor. Run this immediately after instantiation 
     /// to attach prefabs to these GameObject references.
     /// </summary>
-    public void SetPrefabs(GameObject player, GameObject wall, GameObject rampN)
+    public void SetPrefabs(
+        GameObject player = null, 
+        GameObject wall = null, 
+        GameObject rampN = null
+    )
     { 
         Player = player;
         Wall = wall;
