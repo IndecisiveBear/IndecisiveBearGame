@@ -7,17 +7,21 @@ public class GridTestSceneInit : MonoBehaviour
     public GameObject RampN;
     GridGenerator Grid;
     static string[,] _gridString = new string[,] {
-        {"W"," "," "," ","W", "W"},
-        {"W"," ","P"," ","W", " "},
-        {"W"," "," "," ","W", " "},
-        {"W","W"," ","W","W", " "}
+        {"W"," "," "," ","W","W"},
+        {"W"," ","P"," ","W"," "},
+        {"W"," "," "," ","W"," "},
+        {"W","W"," ","W","W"," "}
     };
 
     void Awake()
     {
         GameObject gameObject = new GameObject("GridGenerator");
         Grid = gameObject.AddComponent<GridGenerator>();
-        Grid.SetPrefabs(Player, Wall, RampN);
+        Grid.SetPrefabs(
+            player: Player, 
+            wall: Wall, 
+            rampN: RampN
+        );
         Grid.GenerateGrid(_gridString);
     }
 }
