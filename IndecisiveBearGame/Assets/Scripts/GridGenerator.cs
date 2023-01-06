@@ -8,35 +8,46 @@ public class GridGenerator : MonoBehaviour
     public GameObject Wall;
     public GameObject RampN;
     public float GridSize = 1f;
-    public int MaxObjectsPerGridLocation;
+    public int MaxObjectsPerLocation;
     public string[,] GridString;
     public GameObject[,,] Grid;
     GameObject Objects;
-    
-    public GridGenerator(string[,] gridString)
-    { 
-        Debug.Log("GridGenerator Constructor running...");
-        GridString = gridString;
-        GenerateGrid();
-    }
 
-    public void GenerateGrid() //GenerateGrid(string[,] gridString)
+    /// <summary>
+    /// <c>GenerateGrid</c> generates a Unity Scene using `gridString` as a template.
+    /// </summary>
+    public void GenerateGrid(string[,] gridString)
     {
         Debug.Log("GridGenerator.GenerateGrid() running...");
-        SetMaxObjectsPerGridLocation(GridString);
-        Grid = new GameObject[GridString.GetLength(0), GridString.GetLength(1), MaxObjectsPerGridLocation];
+        Debug.Log(Player);
+        GridString = gridString; // Set global parameter
+        SetMaxObjectsPerLocation(GridString);
+        Grid = new GameObject[
+            GridString.GetLength(0), 
+            GridString.GetLength(1), 
+            MaxObjectsPerLocation];
         SetGrid(Grid, GridString);
         InstantiateGrid(Grid);
     }
 
     /// <summary>
-    /// <c>SetMaxObjectsPerGridLocation</c> loops through `gridString` and sets 
-    /// `GridGenerator.MaxObjectsPerGridLocation` to be the largest number of 
+    /// <c>SetPrefabs</c> acts as a constructor. Run this immediately after instantiation 
+    /// to attach prefabs to these GameObject references.
+    /// </summary>
+    public void SetPrefabs(GameObject player, GameObject wall, GameObject rampN)
+    { 
+        Player = player;
+        Wall = wall;
+        RampN = rampN;
+    }
+
+    /// <summary>
+    /// <c>SetMaxObjectsPerLocation</c> loops through `gridString` and sets 
+    /// `GridGenerator.MaxObjectsPerLocation` to be the largest number of 
     /// game objects placed in a single location in a scene.
     /// </summary>
-    void SetMaxObjectsPerGridLocation(string[,] gridString)
+    public void SetMaxObjectsPerLocation(string[,] gridString)
     {
-        Debug.Log("GridGenerator.SetMaxObjectsPerGridLocation() running...");
         List<int> objectLengths = new List<int>();
         for(int i = 0; i < gridString.GetLength(0); i++)
         {
@@ -45,12 +56,14 @@ public class GridGenerator : MonoBehaviour
                 objectLengths.Add(ParseGridString(gridString[i, j]).Length);
             }
         }
-        MaxObjectsPerGridLocation = objectLengths.Max();
+        MaxObjectsPerLocation = objectLengths.Max();
     }
 
-    void SetGrid(GameObject[,,] grid, string[,] gridString)
+    /// <summary>
+    /// <c>SetGrid</c> generates `grid` from `gridString`
+    /// </summary>
+    public void SetGrid(GameObject[,,] grid, string[,] gridString)
     {
-        Debug.Log("GridGenerator.SetGrid() running...");
         string[] objectList;
         string item;
         for(int i = 0; i < gridString.GetLength(0); i++)
@@ -58,27 +71,18 @@ public class GridGenerator : MonoBehaviour
             for(int j = 0; j < gridString.GetLength(1); j++)
             {
                 objectList = ParseGridString(gridString[i, j]);
-                for (int k = 0; k < MaxObjectsPerGridLocation; k++)
+                for (int k = 0; k < MaxObjectsPerLocation; k++)
                 {
                     try 
                     {
                         item = objectList[k];
-                        Debug.Log(
-                            "Item : " + item + " on (i, j, k) = (" + i + ", " + j + ", " + k + ")"
-                        );
                         if (item.ToUpper() == " ") grid[i, j, k] = null;
                         if (item.ToUpper() == "P") grid[i, j, k] = Player;
                         if (item.ToUpper() == "W") grid[i, j, k] = Wall;
                         if (item.ToUpper() == "R") grid[i, j, k] = RampN;
-                        Debug.Log(
-                            "Grid(" + i + ", " + j + ", " + k + ") null? " + (grid[i, j, k] is null)
-                        );
                     }
                     catch(System.IndexOutOfRangeException)
                     {
-                        Debug.Log(
-                            "Grid(" + i + ", " + j + ", " + k + ") set to null"
-                        );
                         grid[i, j, k] = null;
                     }
                 }
@@ -86,37 +90,35 @@ public class GridGenerator : MonoBehaviour
         }
     }
 
-    void InstantiateGrid(GameObject[,,] grid)
+    /// <summary>
+    /// <c>InstantiateGrid</c> creates a Unity scene from `grid`.
+    /// </summary>
+    public void InstantiateGrid(GameObject[,,] grid)
     {
-        Debug.Log("GridGenerator.InstantiateGrid() running...");
         for (int i = 0; i < grid.GetLength(0); i++)
         {
             for (int j = 0; j < grid.GetLength(1); j++)
             {
-                for (int k = 0; k < MaxObjectsPerGridLocation; k++)
+                for (int k = 0; k < MaxObjectsPerLocation; k++)
                 {
-                    Debug.Log("grid(" + i + ", " + j + ", " + k + ") = " + grid[i, j, k]);
                     if (grid[i, j, k] is not null)
                     {
-                        Debug.Log("Instantiating Object " + grid[i, j, k]);
                         Objects = Instantiate(
                             grid[i, j, k], 
-                            new Vector2((i - grid.GetLength(0)/2) * GridSize, 
-                                        (j - grid.GetLength(1)/2) * GridSize), 
+                            new Vector2(j * GridSize, (GetSceneHeight() - i) * GridSize),
                             Quaternion.identity
                         );
                     }
                 }
             }
         }
-        Debug.Log("Done Instantiating.");
     }
 
     /// <summary>
     /// <c>ParseGridString</c> parses string `text` into an array of strings
     /// where the elements of the array are strings from `text` separated by `delimiter`.
     /// </summary>
-    string[] ParseGridString(string text, string delimiter = ":")
+    private string[] ParseGridString(string text, string delimiter = ":")
     { 
         // Some expected outputs...
 
@@ -129,11 +131,10 @@ public class GridGenerator : MonoBehaviour
         // ParseGridString("ABCD");
         // >>> string[] { "ABCD" };
 
-        string[] returnString = new string[] {text}; // Boilder plate code.
+        string[] returnString = new string[] {text}; // Boiler plate code.
         return returnString;
     }
 
-    public int GetSceneWidth() { return Grid.GetLength(0); }
-
-    public int GetSceneHeight() { return Grid.GetLength(1); }
+    public int GetSceneHeight() { return Grid.GetLength(0); }
+    public int GetSceneWidth() { return Grid.GetLength(1); }
 }
