@@ -6,6 +6,13 @@ public class Player : MonoBehaviour
     public float PlayerSpeed = WalkSpeed;
     public bool InCollision = false;
     public Vector2 Position;
+    private float GridWidth;
+    private float GridHeight;
+    private float GridSize;
+    private int[] GridLocation;
+    private GameObject[,] LightGrid;
+    private GameObject[,] WallGrid;
+
     GameObject[] Walls;
     BoxCollider2D Body;
 
@@ -13,10 +20,15 @@ public class Player : MonoBehaviour
     {
         Walls = GameObject.FindGameObjectsWithTag("Wall");
         Body = gameObject.GetComponent<BoxCollider2D>();
+
+        WallGrid = new GameObject[(int)GridWidth, (int)GridHeight];
+        GridLocation = FindGridPlacement();
+        GenerateLight();
     }
 
     void Update()
     {
+        
         Position = transform.position;
         Move();
         transform.position = Position;
@@ -48,6 +60,22 @@ public class Player : MonoBehaviour
             var magnitude = Mathf.Sqrt(rightMoveCount * rightMoveCount + upMoveCount * upMoveCount);
             var resultant = rightMoveCount * Vector2.right + upMoveCount * Vector2.up;
             Position += (resultant / magnitude) * PlayerSpeed;
+
+            bool changedPlacement = false;
+            
+            if (GridLocation != null)
+            {
+                if (GridLocation[0] != FindGridPlacement()[0] || GridLocation[1] != FindGridPlacement()[1])
+                {
+                    changedPlacement = true;
+                }
+            }
+            GridLocation = FindGridPlacement();
+            //Debug.Log(GridLocation[0]);
+            if (changedPlacement)
+            {
+                GenerateLight();
+            }
         }
     }
 
@@ -114,5 +142,154 @@ public class Player : MonoBehaviour
             }
         }
         InCollision = false;
+    }
+
+    /// <summary>
+    /// <c>SetGridInformation</c> transfers the grid information from GridGenerator.cs to Player.cs.
+    /// </summary>
+    public void SetGridInformation(string[,] gridString, float gridSize, GameObject[,] lightGrid)
+    {
+        GridHeight = gridString.GetLength(0);
+        GridWidth = gridString.GetLength(1);
+        GridSize = gridSize;
+        LightGrid = lightGrid;
+    }
+
+    /// <summary>
+    /// <c>ConvertToGridPosition</c> is a helper function to quickly convert world positions to grid locations.
+    /// </summary>
+    private int ConvertToGridPosition(float pos, string direction)
+    {
+        if (direction == "x")
+        {
+            return (int)(Mathf.Round(pos / GridSize) * GridSize);
+        }
+        if (direction == "y")
+        {
+            return (int)(GridHeight * GridSize - (Mathf.Round(pos / GridSize) * GridSize));
+        }
+        return -1;
+    }
+
+    /// <summary>
+    /// <c>FindGridPlacement</c> returns the player position in grid coordinates.
+    /// </summary>
+    private int[] FindGridPlacement()
+    {
+        
+        int[] gridLocation = new int[2];
+        gridLocation[0] = ConvertToGridPosition(transform.position.x, "x");
+
+        gridLocation[1] = ConvertToGridPosition(transform.position.y, "y");
+
+        if (gridLocation[0] < 0)
+        {
+            gridLocation[0] = 0;
+        }
+        if (gridLocation[0] >= GridWidth)
+        {
+            gridLocation[0] = (int)GridWidth - 1;
+        }
+        if (gridLocation[1] < 0)
+        {
+            gridLocation[1] = 0;
+        }
+        if (gridLocation[1] >= GridHeight)
+        {
+            gridLocation[1] = (int)GridHeight - 1;
+        }
+
+        return gridLocation;
+    }
+
+    /// <summary>
+    /// <c>FindGridWalls</c> stores the updated wall gameobjects in grid coordinates in 'WallGrid'. 
+    /// </summary>
+    private void FindGridWalls()
+    {
+        for (int i = 0; i < WallGrid.GetLength(0); i += 1)
+        {
+            for (int j = 0; j < WallGrid.GetLength(1); j += 1)
+            {
+                WallGrid[i, j] = null;
+            }
+        }
+        foreach (GameObject wall in Walls)
+        {
+            try
+            {
+                WallGrid[ConvertToGridPosition(wall.transform.position.x, "x"), ConvertToGridPosition(wall.transform.position.y, "y")] = wall;
+            }
+            catch (System.IndexOutOfRangeException)
+            {
+
+            }
+        }
+    }
+
+    /// <summary>
+    /// <c>GenerateLight</c> lights up the tiles next to the player, to some 'depthSize' distance.
+    /// </summary>
+    private void GenerateLight()
+    {
+        for (int i = 0; i < LightGrid.GetLength(0); i += 1)
+        {
+            for (int j = 0; j < LightGrid.GetLength(1); j += 1)
+            {
+                LightGrid[i, j].GetComponent<SpriteRenderer>().color = new Color(0f, 0f, 0f, 1f);
+            }
+        }
+
+        FindGridWalls();
+
+        int depthSize = 9;
+
+        GenerateLightHelper(GridLocation[0] + 1, GridLocation[1] + 1, depthSize, depthSize);
+        GenerateLightHelper(GridLocation[0] - 1, GridLocation[1] + 1, depthSize, depthSize);
+        GenerateLightHelper(GridLocation[0] + 1, GridLocation[1] - 1, depthSize, depthSize);
+        GenerateLightHelper(GridLocation[0] - 1, GridLocation[1] - 1, depthSize, depthSize);
+
+        GenerateLightHelper(GridLocation[0] - 1, GridLocation[1], depthSize, depthSize);
+        GenerateLightHelper(GridLocation[0] + 1, GridLocation[1], depthSize, depthSize);
+        GenerateLightHelper(GridLocation[0], GridLocation[1] - 1, depthSize, depthSize);
+        GenerateLightHelper(GridLocation[0], GridLocation[1] + 1, depthSize, depthSize);
+
+        GenerateLightHelper(GridLocation[0], GridLocation[1], depthSize, depthSize);
+        
+        
+    }
+
+    /// <summary>
+    /// <c>GenerateLightHelper</c> is a helper function for 'GenerateLight', which recursively calls itself 'maxDepth' times. 
+    /// </summary>
+    private void GenerateLightHelper(int x, int y, int depth, int maxDepth)
+    {
+        
+        if (depth == 0)
+        {
+            return;
+        }
+        if (x < 0 || x >= GridWidth * GridSize || y < 0 || y >= GridHeight * GridSize)
+        {
+            return;
+        }
+
+        if (LightGrid[y, x].GetComponent<SpriteRenderer>().color.a > (1f - ((float)depth / (float)maxDepth)))
+        {
+            LightGrid[y, x].GetComponent<SpriteRenderer>().color = new Color(0f, 0f, 0f, 1f - ((float)depth / (float)maxDepth));
+            if (WallGrid[x, y] == null)
+            {
+                GenerateLightHelper(x - 1, y, depth - 1, maxDepth);
+                GenerateLightHelper(x + 1, y, depth - 1, maxDepth);
+                GenerateLightHelper(x, y - 1, depth - 1, maxDepth);
+                GenerateLightHelper(x, y + 1, depth - 1, maxDepth);
+            } else
+            {
+                return;
+            }
+        } else
+        {
+            return;
+        }
     }
 }

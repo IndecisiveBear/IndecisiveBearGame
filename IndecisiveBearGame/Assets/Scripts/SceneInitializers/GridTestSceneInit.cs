@@ -2,9 +2,11 @@ using UnityEngine;
 
 public class GridTestSceneInit : MonoBehaviour
 {
+    public GameObject MainCamera;
     public GameObject Player;
     public GameObject Wall;
     public GameObject RampN;
+    
     GridGenerator Grid;
     static string[,] _gridString = new string[,] {
         {"W"," "," "," ","W","W"},
@@ -23,5 +25,6 @@ public class GridTestSceneInit : MonoBehaviour
             rampN: RampN
         );
         Grid.GenerateGrid(_gridString);
+        Instantiate(MainCamera, new Vector2(0, 0), Quaternion.identity);
     }
 }
