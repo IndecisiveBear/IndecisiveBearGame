@@ -2,7 +2,6 @@ using UnityEngine;
 
 public class MazeOneInitialization : MonoBehaviour
 {
-    public GameObject MainCamera;
     public GameObject Player;
     public GameObject Wall;
     public GameObject RampN;
@@ -62,6 +61,5 @@ public class MazeOneInitialization : MonoBehaviour
             rampN: RampN
         );
         Grid.GenerateGrid(_gridString);
-        Instantiate(MainCamera, new Vector2(0, 0), Quaternion.identity);
     }
 }
