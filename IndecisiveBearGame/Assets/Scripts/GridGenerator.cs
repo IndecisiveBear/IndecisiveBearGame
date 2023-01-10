@@ -4,12 +4,14 @@ using UnityEngine;
 
 public class GridGenerator : MonoBehaviour
 {
+    public GameObject Light;
     public GameObject Player;
     public GameObject Wall;
     public GameObject RampN;
     public float GridSize = 1f;
     public int MaxObjectsPerLocation;
     public string[,] GridString;
+    public GameObject[,] LightGrid;
     public GameObject[,,] Grid;
     GameObject Objects;
 
@@ -99,6 +101,21 @@ public class GridGenerator : MonoBehaviour
     /// </summary>
     public void InstantiateGrid(GameObject[,,] grid)
     {
+        // Generate the Light Grid
+        LightGrid = new GameObject[grid.GetLength(0), grid.GetLength(1)];
+        for (int i = 0; i < grid.GetLength(0); i++)
+        {
+            for (int j = 0; j < grid.GetLength(1); j++)
+            {
+                Objects = Instantiate(
+                            Light,
+                            new Vector2(j * GridSize, (GetSceneHeight() - i) * GridSize),
+                            Quaternion.identity);
+                LightGrid[i, j] = Objects;
+            }
+        }
+
+        // Generate the World Grid
         for (int i = 0; i < grid.GetLength(0); i++)
         {
             for (int j = 0; j < grid.GetLength(1); j++)
@@ -112,7 +129,12 @@ public class GridGenerator : MonoBehaviour
                             new Vector2(j * GridSize, (GetSceneHeight() - i) * GridSize),
                             Quaternion.identity
                         );
+                        if (grid[i, j, k] == Player)
+                        {
+                            Objects.GetComponent<Player>().SetGridInformation(GridString, GridSize, LightGrid);
+                        }
                     }
+                    
                 }
             }
         }
