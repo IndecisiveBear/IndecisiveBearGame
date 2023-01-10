@@ -6,12 +6,12 @@ public class Player : MonoBehaviour
     public float PlayerSpeed = WalkSpeed;
     public bool InCollision = false;
     public Vector2 Position;
-    private float GridWidth;
-    private float GridHeight;
-    private float GridSize;
-    private int[] GridLocation;
-    private GameObject[,] LightGrid;
-    private GameObject[,] WallGrid;
+    private float _gridWidth;
+    private float _gridHeight;
+    private float _gridSize;
+    private int[] _gridLocation;
+    private GameObject[,] _lightGrid;
+    private GameObject[,] _wallGrid;
 
     GameObject[] Walls;
     BoxCollider2D Body;
@@ -21,8 +21,8 @@ public class Player : MonoBehaviour
         Walls = GameObject.FindGameObjectsWithTag("Wall");
         Body = gameObject.GetComponent<BoxCollider2D>();
 
-        WallGrid = new GameObject[(int)GridWidth, (int)GridHeight];
-        GridLocation = FindGridPlacement();
+        _wallGrid = new GameObject[(int)_gridWidth, (int)_gridHeight];
+        _gridLocation = FindGridPlacement();
         GenerateLight();
     }
 
@@ -63,15 +63,15 @@ public class Player : MonoBehaviour
 
             bool changedPlacement = false;
             
-            if (GridLocation != null)
+            if (_gridLocation != null)
             {
-                if (GridLocation[0] != FindGridPlacement()[0] || GridLocation[1] != FindGridPlacement()[1])
+                if (_gridLocation[0] != FindGridPlacement()[0] || _gridLocation[1] != FindGridPlacement()[1])
                 {
                     changedPlacement = true;
                 }
             }
-            GridLocation = FindGridPlacement();
-            //Debug.Log(GridLocation[0]);
+            _gridLocation = FindGridPlacement();
+            //Debug.Log(_gridLocation[0]);
             if (changedPlacement)
             {
                 GenerateLight();
@@ -149,10 +149,10 @@ public class Player : MonoBehaviour
     /// </summary>
     public void SetGridInformation(string[,] gridString, float gridSize, GameObject[,] lightGrid)
     {
-        GridHeight = gridString.GetLength(0);
-        GridWidth = gridString.GetLength(1);
-        GridSize = gridSize;
-        LightGrid = lightGrid;
+        _gridHeight = gridString.GetLength(0);
+        _gridWidth = gridString.GetLength(1);
+        _gridSize = gridSize;
+        _lightGrid = lightGrid;
     }
 
     /// <summary>
@@ -162,11 +162,11 @@ public class Player : MonoBehaviour
     {
         if (direction == "x")
         {
-            return (int)(Mathf.Round(pos / GridSize) * GridSize);
+            return (int)(Mathf.Round(pos / _gridSize) * _gridSize);
         }
         if (direction == "y")
         {
-            return (int)(GridHeight * GridSize - (Mathf.Round(pos / GridSize) * GridSize));
+            return (int)(_gridHeight * _gridSize - (Mathf.Round(pos / _gridSize) * _gridSize));
         }
         return -1;
     }
@@ -186,39 +186,42 @@ public class Player : MonoBehaviour
         {
             gridLocation[0] = 0;
         }
-        if (gridLocation[0] >= GridWidth)
+        if (gridLocation[0] >= _gridWidth)
         {
-            gridLocation[0] = (int)GridWidth - 1;
+            gridLocation[0] = (int)_gridWidth - 1;
         }
         if (gridLocation[1] < 0)
         {
             gridLocation[1] = 0;
         }
-        if (gridLocation[1] >= GridHeight)
+        if (gridLocation[1] >= _gridHeight)
         {
-            gridLocation[1] = (int)GridHeight - 1;
+            gridLocation[1] = (int)_gridHeight - 1;
         }
 
         return gridLocation;
     }
 
     /// <summary>
-    /// <c>FindGridWalls</c> stores the updated wall gameobjects in grid coordinates in 'WallGrid'. 
+    /// <c>FindGridWalls</c> stores the updated wall gameobjects in grid coordinates in '_wallGrid'. 
     /// </summary>
     private void FindGridWalls()
     {
-        for (int i = 0; i < WallGrid.GetLength(0); i += 1)
+        for (int i = 0; i < _wallGrid.GetLength(0); i += 1)
         {
-            for (int j = 0; j < WallGrid.GetLength(1); j += 1)
+            for (int j = 0; j < _wallGrid.GetLength(1); j += 1)
             {
-                WallGrid[i, j] = null;
+                _wallGrid[i, j] = null;
             }
         }
         foreach (GameObject wall in Walls)
         {
             try
             {
-                WallGrid[ConvertToGridPosition(wall.transform.position.x, "x"), ConvertToGridPosition(wall.transform.position.y, "y")] = wall;
+                _wallGrid[
+                    ConvertToGridPosition(wall.transform.position.x, "x"), 
+                    ConvertToGridPosition(wall.transform.position.y, "y")
+                    ] = wall;
             }
             catch (System.IndexOutOfRangeException)
             {
@@ -232,11 +235,11 @@ public class Player : MonoBehaviour
     /// </summary>
     private void GenerateLight()
     {
-        for (int i = 0; i < LightGrid.GetLength(0); i += 1)
+        for (int i = 0; i < _lightGrid.GetLength(0); i += 1)
         {
-            for (int j = 0; j < LightGrid.GetLength(1); j += 1)
+            for (int j = 0; j < _lightGrid.GetLength(1); j += 1)
             {
-                LightGrid[i, j].GetComponent<SpriteRenderer>().color = new Color(0f, 0f, 0f, 1f);
+                _lightGrid[i, j].GetComponent<SpriteRenderer>().color = new Color(0f, 0f, 0f, 1f);
             }
         }
 
@@ -244,17 +247,17 @@ public class Player : MonoBehaviour
 
         int depthSize = 9;
 
-        GenerateLightHelper(GridLocation[0] + 1, GridLocation[1] + 1, depthSize, depthSize);
-        GenerateLightHelper(GridLocation[0] - 1, GridLocation[1] + 1, depthSize, depthSize);
-        GenerateLightHelper(GridLocation[0] + 1, GridLocation[1] - 1, depthSize, depthSize);
-        GenerateLightHelper(GridLocation[0] - 1, GridLocation[1] - 1, depthSize, depthSize);
+        GenerateLightHelper(_gridLocation[0] + 1, _gridLocation[1] + 1, depthSize, depthSize);
+        GenerateLightHelper(_gridLocation[0] - 1, _gridLocation[1] + 1, depthSize, depthSize);
+        GenerateLightHelper(_gridLocation[0] + 1, _gridLocation[1] - 1, depthSize, depthSize);
+        GenerateLightHelper(_gridLocation[0] - 1, _gridLocation[1] - 1, depthSize, depthSize);
 
-        GenerateLightHelper(GridLocation[0] - 1, GridLocation[1], depthSize, depthSize);
-        GenerateLightHelper(GridLocation[0] + 1, GridLocation[1], depthSize, depthSize);
-        GenerateLightHelper(GridLocation[0], GridLocation[1] - 1, depthSize, depthSize);
-        GenerateLightHelper(GridLocation[0], GridLocation[1] + 1, depthSize, depthSize);
+        GenerateLightHelper(_gridLocation[0] - 1, _gridLocation[1], depthSize, depthSize);
+        GenerateLightHelper(_gridLocation[0] + 1, _gridLocation[1], depthSize, depthSize);
+        GenerateLightHelper(_gridLocation[0], _gridLocation[1] - 1, depthSize, depthSize);
+        GenerateLightHelper(_gridLocation[0], _gridLocation[1] + 1, depthSize, depthSize);
 
-        GenerateLightHelper(GridLocation[0], GridLocation[1], depthSize, depthSize);
+        GenerateLightHelper(_gridLocation[0], _gridLocation[1], depthSize, depthSize);
         
         
     }
@@ -269,15 +272,18 @@ public class Player : MonoBehaviour
         {
             return;
         }
-        if (x < 0 || x >= GridWidth * GridSize || y < 0 || y >= GridHeight * GridSize)
+        if (x < 0 || x >= _gridWidth * _gridSize
+            || y < 0 || y >= _gridHeight * _gridSize)
         {
             return;
         }
 
-        if (LightGrid[y, x].GetComponent<SpriteRenderer>().color.a > (1f - ((float)depth / (float)maxDepth)))
+        if (_lightGrid[y, x].GetComponent<SpriteRenderer>().color.a
+            > (1f - ((float)depth / (float)maxDepth)))
         {
-            LightGrid[y, x].GetComponent<SpriteRenderer>().color = new Color(0f, 0f, 0f, 1f - ((float)depth / (float)maxDepth));
-            if (WallGrid[x, y] == null)
+            _lightGrid[y, x].GetComponent<SpriteRenderer>().color
+                = new Color(0f, 0f, 0f, 1f - ((float)depth / (float)maxDepth));
+            if (_wallGrid[x, y] == null)
             {
                 GenerateLightHelper(x - 1, y, depth - 1, maxDepth);
                 GenerateLightHelper(x + 1, y, depth - 1, maxDepth);
