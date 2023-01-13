@@ -189,7 +189,11 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 8026259775165594768, guid: 1e1cb89e396e9664997ba5601db4430d, type: 3}
   m_PrefabInstance: {fileID: 8026259775620006473}
   m_PrefabAsset: {fileID: 0}
+<<<<<<< HEAD
 --- !u!114 &1840381752
+=======
+--- !u!114 &1840381749
+>>>>>>> c6c18bc (Implemented layered grids, as well grid-based collision)
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -267,7 +271,11 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 8026259775165594768, guid: 1e1cb89e396e9664997ba5601db4430d, type: 3}
       insertIndex: -1
+<<<<<<< HEAD
       addedObject: {fileID: 1840381752}
+=======
+      addedObject: {fileID: 1840381749}
+>>>>>>> c6c18bc (Implemented layered grids, as well grid-based collision)
   m_SourcePrefab: {fileID: 100100000, guid: 1e1cb89e396e9664997ba5601db4430d, type: 3}
 --- !u!1001 &8770473159414779290
 PrefabInstance:
