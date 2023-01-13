@@ -189,7 +189,7 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 8026259775165594768, guid: 1e1cb89e396e9664997ba5601db4430d, type: 3}
   m_PrefabInstance: {fileID: 8026259775620006473}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1840381746
+--- !u!114 &1840381752
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -198,7 +198,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1840381739}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e27a4ef117fe19b8a86d04a1dad9de7f, type: 3}
+  m_Script: {fileID: 11500000, guid: 56184a8531c0caeea85af883b111a28f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   Player: {fileID: 1946809703334216982, guid: 5e9fb5743a1cc644d9115283b3ed51d5, type: 3}
@@ -267,7 +267,7 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 8026259775165594768, guid: 1e1cb89e396e9664997ba5601db4430d, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1840381746}
+      addedObject: {fileID: 1840381752}
   m_SourcePrefab: {fileID: 100100000, guid: 1e1cb89e396e9664997ba5601db4430d, type: 3}
 --- !u!1001 &8770473159414779290
 PrefabInstance:
@@ -277,6 +277,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1535580340754805531, guid: b54a13bcd89483047a3f34e55e2ba8d8, type: 3}
+      propertyPath: m_Color.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1535580340754805531, guid: b54a13bcd89483047a3f34e55e2ba8d8, type: 3}
+      propertyPath: m_Color.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1535580340754805531, guid: b54a13bcd89483047a3f34e55e2ba8d8, type: 3}
+      propertyPath: m_Color.r
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1535580340754805531, guid: b54a13bcd89483047a3f34e55e2ba8d8, type: 3}
       propertyPath: m_SortingOrder
       value: -1
@@ -340,6 +352,10 @@ PrefabInstance:
     - target: {fileID: 5407857747769623569, guid: b54a13bcd89483047a3f34e55e2ba8d8, type: 3}
       propertyPath: m_Name
       value: Floor
+      objectReference: {fileID: 0}
+    - target: {fileID: 5407857747769623569, guid: b54a13bcd89483047a3f34e55e2ba8d8, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
