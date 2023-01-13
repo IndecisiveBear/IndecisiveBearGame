@@ -13,6 +13,7 @@ public class GridGenerator : MonoBehaviour
     public string[,] GridString;
     public GameObject[,] LightGrid;
     public GameObject[,,] Grid;
+    public GameObject[,,] GridInstance;
     GameObject Objects;
 
     /// <summary>
@@ -27,6 +28,10 @@ public class GridGenerator : MonoBehaviour
         Grid = new GameObject[
             GridString.GetLength(0), 
             GridString.GetLength(1), 
+            MaxObjectsPerLocation];
+        GridInstance = new GameObject[
+            GridString.GetLength(0),
+            GridString.GetLength(1),
             MaxObjectsPerLocation];
         SetGrid(Grid, GridString);
         InstantiateGrid(Grid);
@@ -111,11 +116,14 @@ public class GridGenerator : MonoBehaviour
                             Light,
                             new Vector2(j * GridSize, (GetSceneHeight() - i) * GridSize),
                             Quaternion.identity);
+                Objects.GetComponent<SpriteRenderer>().sortingOrder = MaxObjectsPerLocation + 1;
                 LightGrid[i, j] = Objects;
             }
         }
 
         // Generate the World Grid
+        GameObject player = null;
+        int playerLayer = -1;
         for (int i = 0; i < grid.GetLength(0); i++)
         {
             for (int j = 0; j < grid.GetLength(1); j++)
@@ -129,22 +137,31 @@ public class GridGenerator : MonoBehaviour
                             new Vector2(j * GridSize, (GetSceneHeight() - i) * GridSize),
                             Quaternion.identity
                         );
+                        
                         if (grid[i, j, k] == Player)
                         {
-                            Objects.GetComponent<Player>().SetGridInformation(GridString, GridSize, LightGrid);
+                            player = Objects;
+                            playerLayer = k;
                         }
+
+                        GridInstance[i, j, k] = Objects;
                     }
                     
                 }
             }
         }
+        if (player != null)
+        {
+            player.GetComponent<Player>().SetGridInformation(GridString, GridSize, LightGrid, GridInstance, playerLayer, MaxObjectsPerLocation);
+        }
+        
     }
 
     /// <summary>
     /// <c>ParseGridString</c> parses string `text` into an array of strings
     /// where the elements of the array are strings from `text` separated by `delimiter`.
     /// </summary>
-    private string[] ParseGridString(string text, string delimiter = ":")
+    private string[] ParseGridString(string text, char delimiter = ':')
     { 
         // Some expected outputs...
 
@@ -157,7 +174,40 @@ public class GridGenerator : MonoBehaviour
         // ParseGridString("ABCD");
         // >>> string[] { "ABCD" };
 
-        string[] returnString = new string[] {text}; // Boiler plate code.
+        string[] tempStringArray = new string[text.Length];
+        string substring = "";
+        int count = 0;
+        foreach (char c in text)
+        {
+            if (c == delimiter)
+            {
+                if (substring != "")
+                {
+                    tempStringArray[count] = substring;
+                    substring = "";
+                    count += 1;
+                }
+            } else
+            {
+                substring += c;
+            }
+        }
+        if (substring != "")
+        {
+            tempStringArray[count] = substring;
+        } else
+        {
+            count -= 1;
+        }
+
+        if (count < 0)
+        {
+            return null;
+        }
+
+        string[] returnString = tempStringArray[0..(count+1)];
+
+        
         return returnString;
     }
 
