@@ -97,7 +97,6 @@ public class Player : MonoBehaviour
                 Mathf.Abs(body1.bounds.center.y - body2.bounds.center.y) < 1.5f * body2.bounds.extents.y)
             {
                 // Colliding with right edge of body2
-                
                 Position.x = body2.bounds.center.x + body2.bounds.extents.x + body1.bounds.extents.x;
                 transform.position = Position;
             }
@@ -131,33 +130,6 @@ public class Player : MonoBehaviour
     /// <c>Operation</c> is a delegate operation method meant to be overridden by a newly defined operation.
     /// </summary>
     delegate void Operation(int x, int y);
-
-    /// <summary>
-    /// <c>PlayerCollisionHelper</c> is a helper function for PlayerCollision.
-    /// </summary>
-    void PlayerCollisionHelper(BoxCollider2D playerBody, string obstacles, float loc_x, float loc_y)
-    {
-        /// <summary>
-        /// <c>PlayerCollisionInnerHelper</c> overrides Operation.
-        /// </summary>
-        void PlayerCollisionInnerHelper(int x, int y)
-        {
-            if (_currentGrid[x, y] != null && _currentGrid[x, y].tag == obstacles)
-            {
-                BoxCollider2D box = _currentGrid[x, y].GetComponent<BoxCollider2D>();
-                if (DetectCollision(playerBody, box))
-                {
-                    
-                    InCollision = true;
-                }
-            }
-        }
-
-        Operation helper = new Operation(PlayerCollisionInnerHelper);
-
-        OperateOnNearbySquares(loc_x, loc_y, helper);
-        
-    }
 
     /// <summary>
     /// <c>OperateOnNearbySquares</c> performs an operation (a method passed as a parameter) 
@@ -209,7 +181,6 @@ public class Player : MonoBehaviour
                 operation((int)x, (int)(y + 1));
             }
         }
-        
     }
 
     /// <summary>
@@ -217,7 +188,24 @@ public class Player : MonoBehaviour
     /// </summary>
     private void PlayerCollision(BoxCollider2D playerBody, string obstacles)
     {
-        PlayerCollisionHelper(playerBody, obstacles, transform.position.x, transform.position.y);
+        /// <summary>
+        /// <c>PlayerCollisionInnerHelper</c> overrides Operation.
+        /// </summary>
+        void PlayerCollisionInnerHelper(int x, int y)
+        {
+            if (_currentGrid[x, y] != null && _currentGrid[x, y].tag == obstacles)
+            {
+                BoxCollider2D box = _currentGrid[x, y].GetComponent<BoxCollider2D>();
+                if (DetectCollision(playerBody, box))
+                {
+                    InCollision = true;
+                }
+            }
+        }
+
+        Operation helper = new Operation(PlayerCollisionInnerHelper);
+
+        OperateOnNearbySquares(transform.position.x, transform.position.y, helper);
 
         InCollision = false;
     }
@@ -225,8 +213,14 @@ public class Player : MonoBehaviour
     /// <summary>
     /// <c>SetGridInformation</c> transfers the grid information from GridGenerator.cs to Player.cs.
     /// </summary>
-    public void SetGridInformation(string[,] gridString, float gridSize,
-        GameObject[,] lightGrid, GameObject[,,] gridLayers, int currentLayer, int maxLayer)
+    public void SetGridInformation(
+        string[,] gridString,
+        float gridSize,
+        GameObject[,] lightGrid,
+        GameObject[,,] gridLayers,
+        int currentLayer,
+        int maxLayer
+        )
     {
         _gridHeight = gridString.GetLength(0);
         _gridWidth = gridString.GetLength(1);
@@ -351,8 +345,6 @@ public class Player : MonoBehaviour
         GenerateLightHelper(_gridLocation[0], _gridLocation[1] + 1, depthSize, depthSize);
 
         GenerateLightHelper(_gridLocation[0], _gridLocation[1], depthSize, depthSize);
-        
-        
     }
 
     /// <summary>
@@ -380,14 +372,16 @@ public class Player : MonoBehaviour
             if (_currentGrid[x, y] != null && _currentGrid[x, y].tag == "Wall")
             {
                 return;
-            } else
+            } 
+            else
             {
                 GenerateLightHelper(x - 1, y, depth - 1, maxDepth);
                 GenerateLightHelper(x + 1, y, depth - 1, maxDepth);
                 GenerateLightHelper(x, y - 1, depth - 1, maxDepth);
                 GenerateLightHelper(x, y + 1, depth - 1, maxDepth);
             }
-        } else
+        } 
+        else
         {
             return;
         }

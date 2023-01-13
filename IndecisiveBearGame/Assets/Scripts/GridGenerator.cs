@@ -146,15 +146,20 @@ public class GridGenerator : MonoBehaviour
 
                         GridInstance[i, j, k] = Objects;
                     }
-                    
                 }
             }
         }
         if (player != null)
         {
-            player.GetComponent<Player>().SetGridInformation(GridString, GridSize, LightGrid, GridInstance, playerLayer, MaxObjectsPerLocation);
+            player.GetComponent<Player>().SetGridInformation(
+                gridString: GridString,
+                gridSize: GridSize,
+                lightGrid: LightGrid, 
+                gridLayers: GridInstance, 
+                currentLayer: playerLayer,
+                maxLayer: MaxObjectsPerLocation
+                );
         }
-        
     }
 
     /// <summary>
@@ -163,17 +168,6 @@ public class GridGenerator : MonoBehaviour
     /// </summary>
     private string[] ParseGridString(string text, char delimiter = ':')
     { 
-        // Some expected outputs...
-
-        // ParseGridString("A:BC:D");
-        // >>> string[] { "A", "BC", "D" };
-
-        // ParseGridString(":A:BC:D:");
-        // >>> string[] { "A", "BC", "D" };
-
-        // ParseGridString("ABCD");
-        // >>> string[] { "ABCD" };
-
         string[] tempStringArray = new string[text.Length];
         string substring = "";
         int count = 0;
@@ -187,7 +181,8 @@ public class GridGenerator : MonoBehaviour
                     substring = "";
                     count += 1;
                 }
-            } else
+            } 
+            else
             {
                 substring += c;
             }
@@ -195,7 +190,8 @@ public class GridGenerator : MonoBehaviour
         if (substring != "")
         {
             tempStringArray[count] = substring;
-        } else
+        } 
+        else
         {
             count -= 1;
         }
