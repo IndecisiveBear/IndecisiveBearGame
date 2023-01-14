@@ -57,7 +57,7 @@ public class GridGenerator : MonoBehaviour
     /// `GridGenerator.MaxObjectsPerLocation` to be the largest number of 
     /// game objects placed in a single location in a scene.
     /// </summary>
-    public void SetMaxObjectsPerLocation(string[,] gridString)
+    private void SetMaxObjectsPerLocation(string[,] gridString)
     {
         int maxObjects = 0;
         int proposedMax;
@@ -75,7 +75,7 @@ public class GridGenerator : MonoBehaviour
     /// <summary>
     /// <c>SetGrid</c> generates `grid` from `gridString`
     /// </summary>
-    public void SetGrid(GameObject[,,] grid, string[,] gridString)
+    private void SetGrid(GameObject[,,] grid, string[,] gridString)
     {
         string[] objectList;
         string item;
@@ -103,7 +103,7 @@ public class GridGenerator : MonoBehaviour
     /// <summary>
     /// <c>InstantiateGrid</c> creates a Unity scene from `grid`.
     /// </summary>
-    public void InstantiateGrid(GameObject[,,] grid)
+    private void InstantiateGrid(GameObject[,,] grid)
     {
         // Generate the Light Grid
         LightGrid = new GameObject[grid.GetLength(0), grid.GetLength(1)];

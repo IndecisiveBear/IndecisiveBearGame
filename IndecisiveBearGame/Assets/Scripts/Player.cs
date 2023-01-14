@@ -129,7 +129,7 @@ public class Player : MonoBehaviour
     /// <c>OperateOnNearbySquares</c> performs an operation (a method passed as a parameter) 
     /// on all nearby grid squares to a given location.
     /// </summary>
-    void OperateOnNearbySquares(float x, float y, Operation operation)
+    private void OperateOnNearbySquares(float x, float y, Operation operation)
     {
         x = ConvertToGridPosition(x, "x");
         y = ConvertToGridPosition(y, "y");
@@ -197,6 +197,7 @@ public class Player : MonoBehaviour
         }
         Operation helper = new Operation(PlayerCollisionInnerHelper);
         OperateOnNearbySquares(transform.position.x, transform.position.y, helper);
+
         InCollision = false;
     }
 
