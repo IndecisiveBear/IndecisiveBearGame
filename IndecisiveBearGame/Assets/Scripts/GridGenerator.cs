@@ -61,15 +61,17 @@ public class GridGenerator : MonoBehaviour
     /// </summary>
     public void SetMaxObjectsPerLocation(string[,] gridString)
     {
-        List<int> objectLengths = new List<int>();
+        int maxObjects = 0;
+        int proposedMax;
         for(int i = 0; i < gridString.GetLength(0); i++)
         {
             for(int j = 0; j < gridString.GetLength(1); j++)
             {
-                objectLengths.Add(ParseGridString(gridString[i, j]).Length);
+                proposedMax = ParseGridString(gridString[i, j]).Length;
+                maxObjects = (proposedMax > maxObjects) ? proposedMax : maxObjects;
             }
         }
-        MaxObjectsPerLocation = objectLengths.Max();
+        MaxObjectsPerLocation = maxObjects;
     }
 
     /// <summary>
@@ -89,10 +91,7 @@ public class GridGenerator : MonoBehaviour
                     try 
                     {
                         item = objectList[k];
-                        if (item.ToUpper() == " ") grid[i, j, k] = null;
-                        if (item.ToUpper() == "P") grid[i, j, k] = Player;
-                        if (item.ToUpper() == "W") grid[i, j, k] = Wall;
-                        if (item.ToUpper() == "R") grid[i, j, k] = RampN;
+                        grid[i, j, k] = DetermineGridItem(item.ToUpper());
                     }
                     catch(System.IndexOutOfRangeException)
                     {
@@ -203,6 +202,37 @@ public class GridGenerator : MonoBehaviour
         }
         string[] returnString = tempStringArray[0..(count+1)];
         return returnString;
+    }
+
+    /// <summary>
+    /// <c>DetermineGridItem</c> converts a string to a game object using an agreed upon dictionary.
+    /// </summary>
+    private GameObject DetermineGridItem(string item)
+    { 
+        GameObject toInitialize;
+        switch (item)
+        { 
+            case " ":
+                toInitialize = null;
+                break;
+            case "P":
+                toInitialize = Player;
+                break;
+            case "W":
+                toInitialize = Wall;
+                break;
+            case "R":
+                toInitialize = RampN;
+                break;
+            default:
+                toInitialize = null;
+                Debug.Log(
+                    "Tried to instantiate invalid GameObject with string ID \"" + item
+                        + "\" in GridGenerator.DetermineGridItem()."
+                );
+                break;
+        }
+        return toInitialize;
     }
 
     public int GetSceneHeight() { return Grid.GetLength(0); }
