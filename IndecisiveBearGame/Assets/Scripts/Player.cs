@@ -14,29 +14,20 @@ public class Player : MonoBehaviour
     private GameObject[][,] _gridLayers;
     private GameObject[,] _currentGrid;
     private int _currentLayer;
-
-    BoxCollider2D Body;
+    BoxCollider2D _body;
 
     void Start()
     {
-        Body = gameObject.GetComponent<BoxCollider2D>();
-
+        _body = gameObject.GetComponent<BoxCollider2D>();
         _gridLocation = FindGridPlacement();
         GenerateLight();
     }
 
     void Update()
     {
-        
         Position = transform.position;
         Move();
         transform.position = Position;
-
-        if (Input.GetKey(KeyCode.Q)) // Warp to origin, for debugging 
-        {
-            Position = Vector2.zero;
-            transform.position = Position;
-        }
     }
 
     /// <summary>
@@ -55,7 +46,7 @@ public class Player : MonoBehaviour
  
         if (upMoveCount != 0 || rightMoveCount != 0)
         {
-            PlayerCollision(Body, "Wall");
+            PlayerCollision(_body, "Wall");
             var magnitude = Mathf.Sqrt(rightMoveCount * rightMoveCount + upMoveCount * upMoveCount);
             var resultant = rightMoveCount * Vector2.right + upMoveCount * Vector2.up;
             Position += (resultant / magnitude) * PlayerSpeed;
@@ -86,7 +77,6 @@ public class Player : MonoBehaviour
     /// </returns>
     private bool DetectCollision(BoxCollider2D body1, BoxCollider2D body2)
     {
-
         if (body1.bounds.center.x + body1.bounds.extents.x >= body2.bounds.center.x - body2.bounds.extents.x &&
             body1.bounds.center.x - body1.bounds.extents.x <= body2.bounds.center.x + body2.bounds.extents.x &&
             body1.bounds.center.y + body1.bounds.extents.y >= body2.bounds.center.y - body2.bounds.extents.y &&
@@ -171,7 +161,6 @@ public class Player : MonoBehaviour
                     operation((int)(x - 1), (int)(y - 1));
                 }
             }
-
             if (y - 1 >= 0)
             {
                 operation((int)x, (int)(y - 1));
@@ -202,11 +191,8 @@ public class Player : MonoBehaviour
                 }
             }
         }
-
         Operation helper = new Operation(PlayerCollisionInnerHelper);
-
         OperateOnNearbySquares(transform.position.x, transform.position.y, helper);
-
         InCollision = false;
     }
 
@@ -220,7 +206,7 @@ public class Player : MonoBehaviour
         GameObject[,,] gridLayers,
         int currentLayer,
         int maxLayer
-        )
+    )
     {
         _gridHeight = gridString.GetLength(0);
         _gridWidth = gridString.GetLength(1);
@@ -232,7 +218,6 @@ public class Player : MonoBehaviour
         {
             _gridLayers[layer] = new GameObject[gridLayers.GetLength(1), gridLayers.GetLength(0)];
         }
-
         for (int i = 0; i < gridLayers.GetLength(0); i++)
         {
             for (int j = 0; j < gridLayers.GetLength(1); j++)
@@ -292,10 +277,8 @@ public class Player : MonoBehaviour
     /// </summary>
     private int[] FindGridPlacement()
     {
-        
         int[] gridLocation = new int[2];
         gridLocation[0] = ConvertToGridPosition(transform.position.x, "x");
-
         gridLocation[1] = ConvertToGridPosition(transform.position.y, "y");
 
         if (gridLocation[0] < 0)
@@ -314,7 +297,6 @@ public class Player : MonoBehaviour
         {
             gridLocation[1] = (int)_gridHeight - 1;
         }
-
         return gridLocation;
     }
 
@@ -353,7 +335,6 @@ public class Player : MonoBehaviour
     /// </summary>
     private void GenerateLightHelper(int x, int y, int depth, int maxDepth)
     {
-        
         if (depth == 0)
         {
             return;
@@ -363,7 +344,6 @@ public class Player : MonoBehaviour
         {
             return;
         }
-
         if (_lightGrid[y, x].GetComponent<SpriteRenderer>().color.a
             > (1f - ((float)depth / (float)maxDepth)))
         {

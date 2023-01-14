@@ -14,7 +14,7 @@ public class GridGenerator : MonoBehaviour
     public GameObject[,] LightGrid;
     public GameObject[,,] Grid;
     public GameObject[,,] GridInstance;
-    GameObject Objects;
+    GameObject _objects;
 
     /// <summary>
     /// <c>GenerateGrid</c> generates a Unity Scene using `gridString` as a template.
@@ -28,11 +28,13 @@ public class GridGenerator : MonoBehaviour
         Grid = new GameObject[
             GridString.GetLength(0), 
             GridString.GetLength(1), 
-            MaxObjectsPerLocation];
+            MaxObjectsPerLocation
+        ];
         GridInstance = new GameObject[
             GridString.GetLength(0),
             GridString.GetLength(1),
-            MaxObjectsPerLocation];
+            MaxObjectsPerLocation
+        ];
         SetGrid(Grid, GridString);
         InstantiateGrid(Grid);
     }
@@ -112,12 +114,13 @@ public class GridGenerator : MonoBehaviour
         {
             for (int j = 0; j < grid.GetLength(1); j++)
             {
-                Objects = Instantiate(
-                            Light,
-                            new Vector2(j * GridSize, (GetSceneHeight() - i) * GridSize),
-                            Quaternion.identity);
-                Objects.GetComponent<SpriteRenderer>().sortingOrder = MaxObjectsPerLocation + 1;
-                LightGrid[i, j] = Objects;
+                _objects = Instantiate(
+                    Light,
+                    new Vector2(j * GridSize, (GetSceneHeight() - i) * GridSize),
+                    Quaternion.identity
+                );
+                _objects.GetComponent<SpriteRenderer>().sortingOrder = MaxObjectsPerLocation + 1;
+                LightGrid[i, j] = _objects;
             }
         }
 
@@ -132,19 +135,17 @@ public class GridGenerator : MonoBehaviour
                 {
                     if (grid[i, j, k] is not null)
                     {
-                        Objects = Instantiate(
+                        _objects = Instantiate(
                             grid[i, j, k], 
                             new Vector2(j * GridSize, (GetSceneHeight() - i) * GridSize),
                             Quaternion.identity
                         );
-                        
                         if (grid[i, j, k] == Player)
                         {
-                            player = Objects;
+                            player = _objects;
                             playerLayer = k;
                         }
-
-                        GridInstance[i, j, k] = Objects;
+                        GridInstance[i, j, k] = _objects;
                     }
                 }
             }
@@ -158,7 +159,7 @@ public class GridGenerator : MonoBehaviour
                 gridLayers: GridInstance, 
                 currentLayer: playerLayer,
                 maxLayer: MaxObjectsPerLocation
-                );
+            );
         }
     }
 
@@ -200,13 +201,11 @@ public class GridGenerator : MonoBehaviour
         {
             return null;
         }
-
         string[] returnString = tempStringArray[0..(count+1)];
-
-        
         return returnString;
     }
 
     public int GetSceneHeight() { return Grid.GetLength(0); }
+
     public int GetSceneWidth() { return Grid.GetLength(1); }
 }
