@@ -14,25 +14,25 @@ public class GridGenerator : MonoBehaviour
     public GameObject[,] LightGrid;
     public GameObject[,,] Grid;
     public GameObject[,,] GridInstance;
-    GameObject Objects;
+    GameObject _objects;
 
     /// <summary>
     /// <c>GenerateGrid</c> generates a Unity Scene using `gridString` as a template.
     /// </summary>
     public void GenerateGrid(string[,] gridString)
     {
-        Debug.Log("GridGenerator.GenerateGrid() running...");
-        Debug.Log(Player);
-        GridString = gridString; // Set global parameter
+        GridString = gridString;
         SetMaxObjectsPerLocation(GridString);
         Grid = new GameObject[
             GridString.GetLength(0), 
             GridString.GetLength(1), 
-            MaxObjectsPerLocation];
+            MaxObjectsPerLocation
+        ];
         GridInstance = new GameObject[
             GridString.GetLength(0),
             GridString.GetLength(1),
-            MaxObjectsPerLocation];
+            MaxObjectsPerLocation
+        ];
         SetGrid(Grid, GridString);
         InstantiateGrid(Grid);
     }
@@ -57,23 +57,25 @@ public class GridGenerator : MonoBehaviour
     /// `GridGenerator.MaxObjectsPerLocation` to be the largest number of 
     /// game objects placed in a single location in a scene.
     /// </summary>
-    public void SetMaxObjectsPerLocation(string[,] gridString)
+    private void SetMaxObjectsPerLocation(string[,] gridString)
     {
-        List<int> objectLengths = new List<int>();
+        int maxObjects = 0;
+        int proposedMax;
         for(int i = 0; i < gridString.GetLength(0); i++)
         {
             for(int j = 0; j < gridString.GetLength(1); j++)
             {
-                objectLengths.Add(ParseGridString(gridString[i, j]).Length);
+                proposedMax = ParseGridString(gridString[i, j]).Length;
+                maxObjects = (proposedMax > maxObjects) ? proposedMax : maxObjects;
             }
         }
-        MaxObjectsPerLocation = objectLengths.Max();
+        MaxObjectsPerLocation = maxObjects;
     }
 
     /// <summary>
     /// <c>SetGrid</c> generates `grid` from `gridString`
     /// </summary>
-    public void SetGrid(GameObject[,,] grid, string[,] gridString)
+    private void SetGrid(GameObject[,,] grid, string[,] gridString)
     {
         string[] objectList;
         string item;
@@ -87,10 +89,7 @@ public class GridGenerator : MonoBehaviour
                     try 
                     {
                         item = objectList[k];
-                        if (item.ToUpper() == " ") grid[i, j, k] = null;
-                        if (item.ToUpper() == "P") grid[i, j, k] = Player;
-                        if (item.ToUpper() == "W") grid[i, j, k] = Wall;
-                        if (item.ToUpper() == "R") grid[i, j, k] = RampN;
+                        grid[i, j, k] = DetermineGridItem(item.ToUpper());
                     }
                     catch(System.IndexOutOfRangeException)
                     {
@@ -104,7 +103,7 @@ public class GridGenerator : MonoBehaviour
     /// <summary>
     /// <c>InstantiateGrid</c> creates a Unity scene from `grid`.
     /// </summary>
-    public void InstantiateGrid(GameObject[,,] grid)
+    private void InstantiateGrid(GameObject[,,] grid)
     {
         // Generate the Light Grid
         LightGrid = new GameObject[grid.GetLength(0), grid.GetLength(1)];
@@ -112,12 +111,13 @@ public class GridGenerator : MonoBehaviour
         {
             for (int j = 0; j < grid.GetLength(1); j++)
             {
-                Objects = Instantiate(
-                            Light,
-                            new Vector2(j * GridSize, (GetSceneHeight() - i) * GridSize),
-                            Quaternion.identity);
-                Objects.GetComponent<SpriteRenderer>().sortingOrder = MaxObjectsPerLocation + 1;
-                LightGrid[i, j] = Objects;
+                _objects = Instantiate(
+                    Light,
+                    new Vector2(j * GridSize, (GetSceneHeight() - i) * GridSize),
+                    Quaternion.identity
+                );
+                _objects.GetComponent<SpriteRenderer>().sortingOrder = MaxObjectsPerLocation + 1;
+                LightGrid[i, j] = _objects;
             }
         }
 
@@ -132,19 +132,17 @@ public class GridGenerator : MonoBehaviour
                 {
                     if (grid[i, j, k] is not null)
                     {
-                        Objects = Instantiate(
+                        _objects = Instantiate(
                             grid[i, j, k], 
                             new Vector2(j * GridSize, (GetSceneHeight() - i) * GridSize),
                             Quaternion.identity
                         );
-                        
                         if (grid[i, j, k] == Player)
                         {
-                            player = Objects;
+                            player = _objects;
                             playerLayer = k;
                         }
-
-                        GridInstance[i, j, k] = Objects;
+                        GridInstance[i, j, k] = _objects;
                     }
                 }
             }
@@ -158,7 +156,7 @@ public class GridGenerator : MonoBehaviour
                 gridLayers: GridInstance, 
                 currentLayer: playerLayer,
                 maxLayer: MaxObjectsPerLocation
-                );
+            );
         }
     }
 
@@ -200,13 +198,42 @@ public class GridGenerator : MonoBehaviour
         {
             return null;
         }
-
         string[] returnString = tempStringArray[0..(count+1)];
-
-        
         return returnString;
     }
 
+    /// <summary>
+    /// <c>DetermineGridItem</c> converts a string to a game object using an agreed upon dictionary.
+    /// </summary>
+    private GameObject DetermineGridItem(string item)
+    { 
+        GameObject toInitialize;
+        switch (item)
+        { 
+            case " ":
+                toInitialize = null;
+                break;
+            case "P":
+                toInitialize = Player;
+                break;
+            case "W":
+                toInitialize = Wall;
+                break;
+            case "R":
+                toInitialize = RampN;
+                break;
+            default:
+                toInitialize = null;
+                Debug.Log(
+                    "Tried to instantiate invalid GameObject with string ID \"" + item
+                        + "\" in GridGenerator.DetermineGridItem()."
+                );
+                break;
+        }
+        return toInitialize;
+    }
+
     public int GetSceneHeight() { return Grid.GetLength(0); }
+
     public int GetSceneWidth() { return Grid.GetLength(1); }
 }
