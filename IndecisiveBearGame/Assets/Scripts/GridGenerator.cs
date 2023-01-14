@@ -21,9 +21,7 @@ public class GridGenerator : MonoBehaviour
     /// </summary>
     public void GenerateGrid(string[,] gridString)
     {
-        Debug.Log("GridGenerator.GenerateGrid() running...");
-        Debug.Log(Player);
-        GridString = gridString; // Set global parameter
+        GridString = gridString;
         SetMaxObjectsPerLocation(GridString);
         Grid = new GameObject[
             GridString.GetLength(0), 
