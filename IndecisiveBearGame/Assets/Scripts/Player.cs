@@ -23,7 +23,7 @@ public class Player : MonoBehaviour
     {
         _body = gameObject.GetComponent<BoxCollider2D>();
         _gridLocation = FindGridPlacement();
-        SetFogParameters(lightFog: true);
+        SetFogParameters(dark: true);
         GenerateFog();
     }
 
