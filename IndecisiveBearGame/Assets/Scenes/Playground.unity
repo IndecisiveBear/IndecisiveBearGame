@@ -204,6 +204,10 @@ MonoBehaviour:
   Player: {fileID: 1946809703334216982, guid: 5e9fb5743a1cc644d9115283b3ed51d5, type: 3}
   Wall: {fileID: 7584299269881206655, guid: b39f2b8c57f368344b9b26e767d94e2c, type: 3}
   RampN: {fileID: 1552509371098281406, guid: 0ec5d5ad719b25d41abc8f9ef315fa82, type: 3}
+  RampS: {fileID: 1552509371098281406, guid: 79fc65c9a16ca8042bba324bbcc587ca, type: 3}
+  RampE: {fileID: 1552509371098281406, guid: d8e85806cf5ceeb43943cad5159b79c9, type: 3}
+  RampW: {fileID: 1552509371098281406, guid: bfb9f4ab889fd9448930078bf7f56a15, type: 3}
+  Tile: {fileID: 7584299269881206655, guid: 405e6bf7532a4a04f80dac3f24f49db4, type: 3}
 --- !u!1001 &8026259775620006473
 PrefabInstance:
   m_ObjectHideFlags: 0
