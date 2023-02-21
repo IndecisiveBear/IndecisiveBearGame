@@ -1,13 +1,9 @@
 fileFormatVersion: 2
-guid: 56184a8531c0caeea85af883b111a28f
+guid: 4ccf9fbf715274241ab0b3de2a71947d
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences:
-  - Player: {instanceID: 0}
-  - Wall: {instanceID: 0}
-  - RampN: {instanceID: 0}
-  - Tile: {instanceID: 0}
+  defaultReferences: []
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
