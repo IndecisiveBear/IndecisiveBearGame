@@ -9,7 +9,6 @@ public class GridTestSceneInit : MonoBehaviour
     public GameObject RampE;
     public GameObject RampW;
     public GameObject Tile;
-
     GridGenerator Grid;
     static string[,] _gridString = new string[,] {
         {" : : : "," : : : "," : : : "," : : : "," : : : "," : : : "," : : : "," : : : "," : : : "," : : : "," : : : "," : : : "," : : : "," : : : "," : : : "},

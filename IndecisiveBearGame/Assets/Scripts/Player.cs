@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class Player : MonoBehaviour
@@ -19,29 +20,23 @@ public class Player : MonoBehaviour
     private BoxCollider2D _startClimbingRamp = null;
     private float _rampFactor = 0f;
     private float _rampFactor2 = 0.9f;
-
-    BoxCollider2D Body;
+    float[] _fogColor = new float[] { 0f, 0f, 0f };
+    int _fogDepthSize = 9;
+    BoxCollider2D _body;
 
     void Start()
     {
-        Body = gameObject.GetComponent<BoxCollider2D>();
-
+        _body = gameObject.GetComponent<BoxCollider2D>();
         _gridLocation = FindGridPlacement();
-        GenerateLight();
+        SetFogParameters(dark: true);
+        GenerateFog();
     }
 
     void Update()
     {
-
         Position = transform.position;
         Move();
         transform.position = Position;
-
-        if (Input.GetKey(KeyCode.Q)) // Warp to origin, for debugging 
-        {
-            Position = Vector2.zero;
-            transform.position = Position;
-        }
     }
 
     /// <summary>
@@ -60,18 +55,18 @@ public class Player : MonoBehaviour
 
         if (upMoveCount != 0 || rightMoveCount != 0)
         {
-            PlayerCollision(Body, "Wall");
-            PlayerCollision(Body, "RampN");
-            PlayerCollision(Body, "RampS");
-            PlayerCollision(Body, "RampW");
-            PlayerCollision(Body, "RampE");
+            PlayerCollision(_body, "Wall");
+            PlayerCollision(_body, "RampN");
+            PlayerCollision(_body, "RampS");
+            PlayerCollision(_body, "RampW");
+            PlayerCollision(_body, "RampE");
             if (_currentLayer > 0)
             {
-                PlayerCollision(Body, "null");
-                PlayerCollision(Body, "RampNDown");
-                PlayerCollision(Body, "RampSDown");
-                PlayerCollision(Body, "RampWDown");
-                PlayerCollision(Body, "RampEDown");
+                PlayerCollision(_body, "null");
+                PlayerCollision(_body, "RampNDown");
+                PlayerCollision(_body, "RampSDown");
+                PlayerCollision(_body, "RampWDown");
+                PlayerCollision(_body, "RampEDown");
             }
             var magnitude = Mathf.Sqrt(rightMoveCount * rightMoveCount + upMoveCount * upMoveCount);
             var resultant = rightMoveCount * Vector2.right + upMoveCount * Vector2.up;
@@ -88,7 +83,7 @@ public class Player : MonoBehaviour
             _gridLocation = FindGridPlacement();
             if (changedPlacement)
             {
-                GenerateLight();
+                GenerateFog();
             }
         }
     }
@@ -289,7 +284,9 @@ public class Player : MonoBehaviour
         }
         else if (_startClimbingRamp == body2)
         {
-            if (body1.bounds.center.y + body1.bounds.extents.y >= body2.bounds.center.y + body2.bounds.extents.y)
+            if (body1.bounds.center.y + body1.bounds.extents.y >= body2.bounds.center.y + body2.bounds.extents.y &&
+                body1.bounds.center.x > body2.bounds.center.x - body2.bounds.extents.x &&
+                body1.bounds.center.x < body2.bounds.center.x + body2.bounds.extents.x)
             {
                 // Exiting with bottom edge of body2
                 MoveDownGrid();
@@ -461,7 +458,9 @@ public class Player : MonoBehaviour
         }
         else if (_startClimbingRamp == body2)
         {
-            if (body1.bounds.center.y - body1.bounds.extents.y <= body2.bounds.center.y - body2.bounds.extents.y)
+            if (body1.bounds.center.y - body1.bounds.extents.y <= body2.bounds.center.y - body2.bounds.extents.y &&
+                body1.bounds.center.x > body2.bounds.center.x - body2.bounds.extents.x &&
+                body1.bounds.center.x < body2.bounds.center.x + body2.bounds.extents.x)
             {
                 // Exiting with top edge of body2
                 MoveDownGrid();
@@ -633,7 +632,9 @@ public class Player : MonoBehaviour
         }
         else if (_startClimbingRamp == body2)
         {
-            if (body1.bounds.center.x + body1.bounds.extents.x >= body2.bounds.center.x + body2.bounds.extents.x)
+            if (body1.bounds.center.x + body1.bounds.extents.x >= body2.bounds.center.x + body2.bounds.extents.x &&
+                body1.bounds.center.y > body2.bounds.center.y - body2.bounds.extents.y &&
+                body1.bounds.center.y < body2.bounds.center.y + body2.bounds.extents.y)
             {
                 // Exiting with right edge of body2
                 MoveDownGrid();
@@ -805,7 +806,9 @@ public class Player : MonoBehaviour
         }
         else if (_startClimbingRamp == body2)
         {
-            if (body1.bounds.center.x - body1.bounds.extents.x <= body2.bounds.center.x - body2.bounds.extents.x)
+            if (body1.bounds.center.x - body1.bounds.extents.x <= body2.bounds.center.x - body2.bounds.extents.x &&
+                body1.bounds.center.y > body2.bounds.center.y - body2.bounds.extents.y &&
+                body1.bounds.center.y < body2.bounds.center.y + body2.bounds.extents.y)
             {
                 // Exiting with right edge of body2
                 MoveDownGrid();
@@ -910,7 +913,7 @@ public class Player : MonoBehaviour
     /// </summary>
     public void ResetDepth()
     {
-        GenerateLight();
+        GenerateFog();
 
         // Reset dimness for lower levels
         for (int i = 0; i < _gridLayers[0].GetLength(0); i++)
@@ -965,7 +968,7 @@ public class Player : MonoBehaviour
     /// <c>OperateOnNearbySquares</c> performs an operation (a method passed as a parameter) 
     /// on all nearby grid squares to a given location.
     /// </summary>
-    void OperateOnNearbySquares(float x, float y, Operation operation)
+    private void OperateOnNearbySquares(float x, float y, Operation operation)
     {
         x = ConvertToGridPosition(x, "x");
         y = ConvertToGridPosition(y, "y");
@@ -1086,7 +1089,6 @@ public class Player : MonoBehaviour
         }
         Operation helper = new Operation(PlayerCollisionInnerHelper);
         OperateOnNearbySquares(transform.position.x, transform.position.y, helper);
-
         InCollision = false;
     }
 
@@ -1204,7 +1206,6 @@ public class Player : MonoBehaviour
     {
         int[] gridLocation = new int[2];
         gridLocation[0] = ConvertToGridPosition(transform.position.x, "x");
-
         gridLocation[1] = ConvertToGridPosition(transform.position.y, "y");
 
         if (gridLocation[0] < 0)
@@ -1253,46 +1254,56 @@ public class Player : MonoBehaviour
     }
 
     /// <summary>
-    /// <c>GenerateLight</c> lights up the tiles next to the player, 
+    /// <c>GenerateFog</c> lights up the tiles next to the player, 
     /// to some 'depthSize' distance.
     /// </summary>
-    private void GenerateLight()
+    private void GenerateFog(int depthSize = -1, float[] rgbColor = null)
     {
+        float r = (rgbColor is null) ? _fogColor[0] : rgbColor[0];
+        float g = (rgbColor is null) ? _fogColor[1] : rgbColor[1];
+        float b = (rgbColor is null) ? _fogColor[2] : rgbColor[2];
+        rgbColor = new float[] { r, g, b };
+        depthSize = (depthSize == -1) ? _fogDepthSize : depthSize;
+        if (rgbColor is not null && rgbColor.Length != 3)
+            throw new ArgumentException("rgbColor should be an float list of RGB values.");
+
         for (int i = 0; i < _lightGrid.GetLength(0); i += 1)
         {
             for (int j = 0; j < _lightGrid.GetLength(1); j += 1)
             {
-                _lightGrid[i, j].GetComponent<SpriteRenderer>().color = new Color(0f, 0f, 0f, 1f);
+                _lightGrid[i, j].GetComponent<SpriteRenderer>().color = new Color(r, g, b, 1f);
                 _brightGrid[i, j].GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, 0f);
             }
         }
-        int depthSize = 9;
 
-        GenerateLightHelper(_gridLocation[0] + 1, _gridLocation[1] + 1, depthSize, depthSize);
-        GenerateLightHelper(_gridLocation[0] - 1, _gridLocation[1] + 1, depthSize, depthSize);
-        GenerateLightHelper(_gridLocation[0] + 1, _gridLocation[1] - 1, depthSize, depthSize);
-        GenerateLightHelper(_gridLocation[0] - 1, _gridLocation[1] - 1, depthSize, depthSize);
+        GenerateFogHelper(_gridLocation[0] + 1, _gridLocation[1] + 1, depthSize, depthSize, rgbColor);
+        GenerateFogHelper(_gridLocation[0] - 1, _gridLocation[1] + 1, depthSize, depthSize, rgbColor);
+        GenerateFogHelper(_gridLocation[0] + 1, _gridLocation[1] - 1, depthSize, depthSize, rgbColor);
+        GenerateFogHelper(_gridLocation[0] - 1, _gridLocation[1] - 1, depthSize, depthSize, rgbColor);
 
-        GenerateLightHelper(_gridLocation[0] - 1, _gridLocation[1], depthSize, depthSize);
-        GenerateLightHelper(_gridLocation[0] + 1, _gridLocation[1], depthSize, depthSize);
-        GenerateLightHelper(_gridLocation[0], _gridLocation[1] - 1, depthSize, depthSize);
-        GenerateLightHelper(_gridLocation[0], _gridLocation[1] + 1, depthSize, depthSize);
+        GenerateFogHelper(_gridLocation[0] - 1, _gridLocation[1], depthSize, depthSize, rgbColor);
+        GenerateFogHelper(_gridLocation[0] + 1, _gridLocation[1], depthSize, depthSize, rgbColor);
+        GenerateFogHelper(_gridLocation[0], _gridLocation[1] - 1, depthSize, depthSize, rgbColor);
+        GenerateFogHelper(_gridLocation[0], _gridLocation[1] + 1, depthSize, depthSize, rgbColor);
 
-        GenerateLightHelper(_gridLocation[0], _gridLocation[1], depthSize, depthSize);
+        GenerateFogHelper(_gridLocation[0], _gridLocation[1], depthSize, depthSize, rgbColor);
     }
 
     /// <summary>
-    /// <c>GenerateLightHelper</c> is a helper function for 'GenerateLight', 
+    /// <c>GenerateFogHelper</c> is a helper function for 'GenerateFog', 
     /// which recursively calls itself 'maxDepth' times. 
     /// </summary>
-    private void GenerateLightHelper(int x, int y, int depth, int maxDepth)
+    private void GenerateFogHelper(int x, int y, int depth, int maxDepth, float[] rgbColor = null)
     {
+        float r = (rgbColor is not null) ? rgbColor[0] : 0f;
+        float g = (rgbColor is not null) ? rgbColor[1] : 0f;
+        float b = (rgbColor is not null) ? rgbColor[2] : 0f;
         if (depth == 0)
         {
             return;
         }
-        if (x < 0 || x >= _gridWidth * _gridSize
-            || y < 0 || y >= _gridHeight * _gridSize)
+        if (x < 0 || x >= _gridWidth * _gridSize ||
+            y < 0 || y >= _gridHeight * _gridSize)
         {
             return;
         }
@@ -1300,7 +1311,7 @@ public class Player : MonoBehaviour
             > (1f - ((float)depth / (float)maxDepth)))
         {
             _lightGrid[y, x].GetComponent<SpriteRenderer>().color
-                = new Color(0f, 0f, 0f, 1f - ((float)depth / (float)maxDepth));
+                = new Color(r, g, b, 1f - ((float)depth / (float)maxDepth));
             GenerateBrightness(x, y);
             if (_currentGrid[x, y] != null && _currentGrid[x, y].tag == "Wall")
             {
@@ -1308,15 +1319,77 @@ public class Player : MonoBehaviour
             }
             else
             {
-                GenerateLightHelper(x - 1, y, depth - 1, maxDepth);
-                GenerateLightHelper(x + 1, y, depth - 1, maxDepth);
-                GenerateLightHelper(x, y - 1, depth - 1, maxDepth);
-                GenerateLightHelper(x, y + 1, depth - 1, maxDepth);
+                GenerateFogHelper(x - 1, y, depth - 1, maxDepth, rgbColor);
+                GenerateFogHelper(x + 1, y, depth - 1, maxDepth, rgbColor);
+                GenerateFogHelper(x, y - 1, depth - 1, maxDepth, rgbColor);
+                GenerateFogHelper(x, y + 1, depth - 1, maxDepth, rgbColor);
             }
         }
         else
         {
             return;
+        }
+    }
+
+    /// <summary>
+    /// <c>SetFogParameters</c> sets the color and depth of the fog. Either
+    /// pass in an int `depthSize` and a float[] `rgbColor` array of RGB channels
+    /// as floats between 0 and 1, or choose one of the presets:
+    /// `dark`, `opaqueDark`, `denseFog`, or `lightFog`. Defaults to black.
+    /// </summary>
+    public void SetFogParameters(
+        int depthSize = -1,
+        float[] rgbColor = null,
+        bool opaqueDark = false,
+        bool dark = false,
+        bool denseFog = false,
+        bool lightFog = false
+    )
+    {
+        // Throw error if more than one bool
+        if ((dark ? 1 : 0) + (opaqueDark ? 1 : 0) + (denseFog ? 1 : 0) + (lightFog ? 1 : 0) > 1)
+            throw new ArgumentException("At most one bool parameter may be `true`.");
+
+        // Throw error if bool + rgb
+        if ((dark ? 1 : 0) + (opaqueDark ? 1 : 0) + (denseFog ? 1 : 0) + (lightFog ? 1 : 0) > 0)
+        {
+            if (rgbColor is not null)
+                throw new ArgumentException("Cannot specify both `rgbColor` and booleans.");
+        }
+
+        // Throw error if rbg is not the correct size
+        if (rgbColor is not null && rgbColor.Length != 3)
+            throw new ArgumentException("rgbColor should be an float list of RGB values.");
+
+        // Actual logic
+        if (rgbColor is not null)
+        {
+            _fogColor = rgbColor;
+            if (depthSize != -1) _fogDepthSize = depthSize;
+        }
+
+        if (dark)
+        {
+            _fogColor = new float[] { 0f, 0f, 0f };
+            if (depthSize == -1) _fogDepthSize = 9;
+        }
+
+        if (opaqueDark)
+        {
+            _fogColor = new float[] { 0f, 0f, 0f };
+            if (depthSize == -1) _fogDepthSize = 4;
+        }
+
+        if (denseFog)
+        {
+            _fogColor = new float[] { 0.3f, 0.3f, 0.3f };
+            if (depthSize == -1) _fogDepthSize = 6;
+        }
+
+        if (lightFog)
+        {
+            _fogColor = new float[] { 0.5f, 0.5f, 0.5f };
+            if (depthSize == -1) _fogDepthSize = 16;
         }
     }
 }
