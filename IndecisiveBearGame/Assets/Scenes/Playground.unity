@@ -191,6 +191,7 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 --- !u!114 &1840381752
 =======
 --- !u!114 &1840381749
@@ -198,6 +199,9 @@ GameObject:
 =======
 --- !u!114 &1840381752
 >>>>>>> 62727e2 (grid layers, fixed style changes)
+=======
+--- !u!114 &1840381752
+>>>>>>> b2b03331a7ba1881996178fbc94d306e833a9898
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -281,6 +285,7 @@ PrefabInstance:
       insertIndex: -1
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
       addedObject: {fileID: 1840381752}
 =======
       addedObject: {fileID: 1840381749}
@@ -288,6 +293,9 @@ PrefabInstance:
 =======
       addedObject: {fileID: 1840381752}
 >>>>>>> 62727e2 (grid layers, fixed style changes)
+=======
+      addedObject: {fileID: 1840381752}
+>>>>>>> b2b03331a7ba1881996178fbc94d306e833a9898
   m_SourcePrefab: {fileID: 100100000, guid: 1e1cb89e396e9664997ba5601db4430d, type: 3}
 --- !u!1001 &8770473159414779290
 PrefabInstance:
