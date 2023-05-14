@@ -97,7 +97,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 56184a8531c0caeea85af883b111a28f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MainCamera: {fileID: 5323503365422760896, guid: 96721574c0185f542bbff3218610f254, type: 3}
   Player: {fileID: 1946809703334216982, guid: 5e9fb5743a1cc644d9115283b3ed51d5, type: 3}
   Wall: {fileID: 7584299269881206655, guid: b39f2b8c57f368344b9b26e767d94e2c, type: 3}
   RampN: {fileID: 1552509371098281406, guid: 0ec5d5ad719b25d41abc8f9ef315fa82, type: 3}
+  Tile: {fileID: 7584299269881206655, guid: 405e6bf7532a4a04f80dac3f24f49db4, type: 3}

@@ -5,6 +5,15 @@ TagManager:
   serializedVersion: 2
   tags:
   - Wall
+  - RampN
+  - RampNDown
+  - RampS
+  - RampW
+  - RampE
+  - RampSDown
+  - RampWDown
+  - RampEDown
+  - Lights
   layers:
   - Default
   - TransparentFX
